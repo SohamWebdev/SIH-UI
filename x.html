@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UI Camera Website</title>
+    <style>
+        body {
+            background-color: #111; /* Dark blue background color */
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            font-family: Arial, sans-serif;
+        }
+        
+        .camera-window {
+            width: 80%;
+            max-width: 400px;
+            height: 60vh;
+            background-color: #000;
+            border: 2px solid #fff;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .camera-button,
+        .upload-button {
+            background-color: #4CAF50; /* Green button color */
+            color: #fff;
+            border: none;
+            padding: 10px 20px;
+            margin-top: 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .camera-button:hover,
+        .upload-button:hover {
+            background-color: #45a049; /* Darker green on hover */
+        }
+
+        footer {
+            margin-top: 20px;
+            color: #fff;
+            text-align: center;
+        }
+        .top-heading {
+            color: white; /* White font color */
+            font-size: 36px; /* Adjust the font size as needed */
+            text-align: center;
+            margin-top: 40px; /* Add space between the heading and buttons */
+            animation: fadeIn 1s ease-in-out; /* Fade-in animation */
+        }
+
+        /* Keyframes for the fade-in animation */
+        @keyframes fadeIn {
+            from {
+                opacity: 40;
+            }
+            to {
+                opacity:-999999999999999;
+            }
+        }
+        .navbar {
+            background-color: #333; /* Dark background color for the navbar */
+            overflow: hidden;
+        }
+        
+        /* Style for the navigation buttons */
+        .navbar a {
+            float: left;
+            display: block;
+            color: white;
+            text-align: center;
+            padding: 14px 16px;
+            text-decoration: none;
+        }
+        
+        /* Style for the navigation buttons on hover */
+        .navbar a:hover {
+            background-color: #ddd; /* Light background color on hover */
+            color: black;
+        }
+    </style>
+</head>
+<body>
+    <div class="navbar">
+        <a href="contact.html">Contact Us</a>
+        <a href="help.html">Help</a>
+        <a href="#info">Information</a>
+    </div>
+
+    <h1 class="top-heading">ROBUST HUMAN DETECTION MODEL</h1>
+    <div class="camera-window" id="cameraWindow">
+        <!-- Camera content goes here -->
+        <video id="cameraFeed" autoplay></video>
+    </div>
+    <button class="camera-button" id="startCamera">Start Camera</button>
+    <label for="imageUploadInput" class="upload-button" id="uploadImage">
+        Choose File
+        <input type="file" accept="image/*" style="display: none;" id="imageUploadInput">
+    </label>
+    <footer>&copy; 2023 Copy Right Reserved.</footer>
+    
+    <script>
+        const cameraWindow = document.getElementById('cameraWindow');
+        const cameraFeed = document.getElementById('cameraFeed');
+        const startCameraButton = document.getElementById('startCamera');
+        const imageUploadInput = document.getElementById('imageUploadInput');
+        
+        let isCameraOn = false;
+        
+        // Function to start or stop the camera
+        function toggleCamera() {
+            if (!isCameraOn) {
+                // Start camera
+                navigator.mediaDevices.getUserMedia({ video: true })
+                    .then(stream => {
+                        cameraFeed.srcObject = stream;
+                        isCameraOn = true;
+                        startCameraButton.textContent = 'Stop Camera';
+                    })
+                    .catch(error => {
+                        console.error('Error accessing camera:', error);
+                    });
+            } else {
+                // Stop camera
+                const mediaStream = cameraFeed.srcObject;
+                if (mediaStream) {
+                    mediaStream.getTracks().forEach(track => {
+                        track.stop();
+                    });
+                }
+                cameraFeed.srcObject = null;
+                isCameraOn = false;
+                startCameraButton.textContent = 'Start Camera';
+            }
+        }
+        
+        // Event listener for the start/stop camera button
+        startCameraButton.addEventListener('click', toggleCamera);
+        
+        // Event listener for image upload
+        imageUploadInput.addEventListener('change', function () {
+            const selectedFile = imageUploadInput.files[0];
+            if (selectedFile) {
+                const formData = new FormData();
+                formData.append('image', selectedFile);
+                
+                // Example: Upload the image using fetch
+                fetch('your-upload-endpoint-url', {
+                    method: 'POST',
+                    body: formData
+                })
+                .then(response => response.json())
+                .then(data => {
+                    // Handle the response from the server
+                    console.log('Upload response:', data);
+                })
+                .catch(error => {
+                    console.error('Image upload failed:', error);
+                });
+            }
+        });
+    </script>
+</body>
+</html>
